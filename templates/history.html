@@ -838,8 +838,21 @@
             document.getElementById('listView').hidden = true;
             document.getElementById('detailView').hidden = false;
             document.getElementById('detailTitle').textContent = entry.title || 'Untitled video';
-            document.getElementById('detailMeta').textContent =
-                `Video ID: ${entry.videoId || '-'} · Bahasa: ${entry.language || '-'} · Disimpan ${formatDate(entry.createdAt)}`;
+            const detailMeta = document.getElementById('detailMeta');
+            detailMeta.replaceChildren(document.createTextNode('Video ID: '));
+            if (entry.videoId) {
+                const videoLink = document.createElement('a');
+                videoLink.href = `https://www.youtube.com/watch?v=${encodeURIComponent(entry.videoId)}`;
+                videoLink.textContent = entry.videoId;
+                videoLink.target = '_blank';
+                videoLink.rel = 'noopener noreferrer';
+                detailMeta.append(videoLink);
+            } else {
+                detailMeta.append(document.createTextNode('-'));
+            }
+            detailMeta.append(document.createTextNode(
+                ` · Bahasa: ${entry.language || '-'} · Disimpan ${formatDate(entry.createdAt)}`
+            ));
             document.getElementById('detailTranscript').textContent =
                 entry.transcript || 'Transkrip tidak tersedia.';
             const keyPoints = document.getElementById('detailKeyPoints');
