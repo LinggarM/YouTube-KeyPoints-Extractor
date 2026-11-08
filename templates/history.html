@@ -59,8 +59,25 @@
 
         .nav-actions {
             display: flex;
-            flex-wrap: wrap;
+            flex: 1;
+            align-items: center;
+            justify-content: space-between;
             gap: 10px;
+            margin-left: 24px;
+        }
+
+        .page-links,
+        .nav-settings {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-links .nav-link[aria-current="page"] {
+            color: #fff;
+            background: linear-gradient(120deg, #667eea, #764ba2);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.22);
         }
 
         .brand {
@@ -704,6 +721,18 @@
                 margin-bottom: 28px;
             }
 
+            .nav-actions {
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                margin-left: 0;
+            }
+
+            .page-links,
+            .nav-settings {
+                gap: 8px;
+            }
+
             .filter-grid {
                 grid-template-columns: 1fr 1fr;
             }
@@ -752,8 +781,17 @@
         <nav class="topbar" aria-label="Navigasi utama">
             <span class="brand">🎬 YOUTUBE KEYPOINTS</span>
             <div class="nav-actions">
-                <a class="nav-link" href="/">← Kembali ke Extractor</a>
-                <button class="button button-muted" id="themeToggle" type="button" aria-pressed="false"></button>
+                <div class="page-links" aria-label="Navigasi halaman">
+                    <a class="nav-link" href="/">🏠 Extractor</a>
+                    <a class="nav-link" href="/history" aria-current="page">🕘 Riwayat Lokal</a>
+                </div>
+                <div class="nav-settings">
+                    <select class="nav-link" id="appLanguage" aria-label="Application language">
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="en">English</option>
+                    </select>
+                    <button class="nav-link" id="themeToggle" type="button" aria-pressed="false"></button>
+                </div>
             </div>
         </nav>
 
@@ -821,22 +859,23 @@
                     </nav>
                     <button class="button button-danger" id="detailDeleteButton" type="button">🗑 Hapus</button>
                 </div>
-                <h1 class="detail-title" id="detailTitle"></h1>
-                <p class="detail-meta" id="detailMeta"></p>
+                <h1 class="detail-title" id="detailTitle" data-no-translate></h1>
+                <p class="detail-meta" id="detailMeta" data-no-translate></p>
             </div>
             <div class="detail-content">
                 <section class="content-section">
                     <h2>📝 Transkrip</h2>
-                    <pre class="content-text" id="detailTranscript"></pre>
+                    <pre class="content-text" id="detailTranscript" data-no-translate></pre>
                 </section>
                 <section class="content-section">
                     <h2>🔑 Key Points</h2>
-                    <div class="content-text markdown-content" id="detailKeyPoints"></div>
+                    <div class="content-text markdown-content" id="detailKeyPoints" data-no-translate></div>
                 </section>
             </div>
         </section>
     </main>
 
+    <script src="{{ url_for('static', filename='i18n.js') }}"></script>
     <script>
         const HISTORY_STORAGE_KEY = 'youtubeKeyPointsHistory';
         const HISTORY_IMPORT_TOKEN_KEY = 'youtubeKeyPointsHistoryImportToken';
@@ -854,8 +893,10 @@
         function updateThemeToggle() {
             const isDark = document.documentElement.dataset.theme === 'dark';
             const toggle = document.getElementById('themeToggle');
-            toggle.textContent = isDark ? '☀️ Mode terang' : '🌙 Mode gelap';
-            toggle.setAttribute('aria-label', isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap');
+            toggle.textContent = window.translateAppText(isDark ? '☀️ Mode terang' : '🌙 Mode gelap');
+            toggle.setAttribute('aria-label', window.translateAppText(
+                isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'
+            ));
             toggle.setAttribute('aria-pressed', String(isDark));
         }
 
@@ -957,7 +998,7 @@
             document.getElementById('resultCount').textContent = '';
             document.getElementById('pagination').hidden = true;
             document.getElementById('errorMessage').textContent =
-                `${error.message || 'SQLite tidak tersedia.'} Data riwayat tidak diubah.`;
+                `${window.translateAppText(error.message || 'SQLite tidak tersedia.')} ${window.translateAppText('Data riwayat tidak diubah.')}`;
         }
 
         function formatDate(value) {
@@ -965,15 +1006,16 @@
             if (Number.isNaN(date.getTime())) {
                 return 'Tanggal tidak tersedia';
             }
-            return new Intl.DateTimeFormat('id-ID', {
+            return new Intl.DateTimeFormat(window.appLanguage === 'id' ? 'id-ID' : 'en-US', {
                 dateStyle: 'medium',
                 timeStyle: 'short'
             }).format(date);
         }
 
-        function makeChip(text) {
+        function makeChip(text, preserveText = false) {
             const chip = document.createElement('span');
             chip.className = 'meta-chip';
+            if (preserveText) chip.dataset.noTranslate = '';
             chip.textContent = text;
             return chip;
         }
@@ -1026,25 +1068,29 @@
                 const title = document.createElement('button');
                 title.className = 'entry-title entry-title-button';
                 title.type = 'button';
+                title.dataset.noTranslate = '';
                 title.textContent = entry.title || 'Untitled video';
                 title.addEventListener('click', () => openEntry(entry.id));
                 heading.appendChild(title);
                 const date = document.createElement('time');
                 date.className = 'entry-date';
+                date.dataset.noTranslate = '';
                 date.dateTime = entry.createdAt || '';
                 date.textContent = formatDate(entry.createdAt);
                 topline.append(heading, date);
 
                 const metadata = document.createElement('div');
                 metadata.className = 'entry-meta';
-                if (entry.channelName) metadata.appendChild(makeChip(`${entry.channelName}`));
-                if (entry.videoId) metadata.appendChild(makeChip(`Video ${entry.videoId}`));
-                if (entry.language) metadata.appendChild(makeChip(entry.language));
+                if (entry.channelName) metadata.appendChild(makeChip(`${entry.channelName}`, true));
+                if (entry.videoId) metadata.appendChild(makeChip(`Video ${entry.videoId}`, true));
+                if (entry.language) metadata.appendChild(makeChip(entry.language, true));
                 metadata.appendChild(makeChip(entry.keyPoints ? 'Key points tersedia' : 'Transkrip saja'));
 
                 const preview = document.createElement('p');
                 preview.className = 'entry-preview';
-                preview.textContent = entry.transcript || 'Transkrip tidak tersedia.';
+                preview.dataset.noTranslate = '';
+                preview.textContent = entry.transcript ||
+                    window.translateAppText('Transkrip tidak tersedia.');
 
                 const actions = document.createElement('div');
                 actions.className = 'entry-actions';
@@ -1077,9 +1123,9 @@
             document.getElementById('detailView').hidden = false;
             document.getElementById('detailTitle').textContent = entry.title || 'Untitled video';
             const detailMeta = document.getElementById('detailMeta');
-            detailMeta.replaceChildren(
-                document.createTextNode(`Channel: ${entry.channelName || '-'} · Video ID: `)
-            );
+            detailMeta.replaceChildren(document.createTextNode(
+                `${window.appLanguage === 'id' ? 'Kanal' : 'Channel'}: ${entry.channelName || '-'} · Video ID: `
+            ));
             if (entry.videoId) {
                 const videoLink = document.createElement('a');
                 videoLink.href = `https://www.youtube.com/watch?v=${encodeURIComponent(entry.videoId)}`;
@@ -1091,16 +1137,17 @@
                 detailMeta.append(document.createTextNode('-'));
             }
             detailMeta.append(document.createTextNode(
-                ` · Bahasa: ${entry.language || '-'} · Disimpan ${formatDate(entry.createdAt)}`
+                ` · ${window.appLanguage === 'id' ? 'Bahasa' : 'Language'}: ${entry.language || '-'} · ${window.appLanguage === 'id' ? 'Disimpan' : 'Saved'} ${formatDate(entry.createdAt)}`
             ));
             document.getElementById('detailTranscript').textContent =
-                entry.transcript || 'Transkrip tidak tersedia.';
+                entry.transcript || window.translateAppText('Transkrip tidak tersedia.');
             const keyPoints = document.getElementById('detailKeyPoints');
             if (entry.keyPoints && typeof marked !== 'undefined' && typeof DOMPurify !== 'undefined') {
                 marked.setOptions({breaks: true, gfm: true});
                 keyPoints.innerHTML = DOMPurify.sanitize(marked.parse(entry.keyPoints));
             } else {
-                keyPoints.textContent = entry.keyPoints || 'Key points belum dibuat untuk video ini.';
+                keyPoints.textContent = entry.keyPoints ||
+                    window.translateAppText('Key points belum dibuat untuk video ini.');
             }
         }
 
@@ -1170,7 +1217,9 @@
 
             const confirmation = await Swal.fire({
                 title: 'Hapus riwayat ini?',
-                text: `“${entry.title || 'Untitled video'}” akan dihapus dari database SQLite.`,
+                text: window.appLanguage === 'id'
+                    ? `“${entry.title || 'Untitled video'}” akan dihapus dari database SQLite.`
+                    : `“${entry.title || 'Untitled video'}” will be deleted from the SQLite database.`,
                 icon: 'warning',
                 showCancelButton: true,
                 confirmButtonText: 'Ya, hapus',
@@ -1243,6 +1292,14 @@
         document.getElementById('nextEntry').addEventListener('click', () => navigateEntry(1));
         document.getElementById('detailDeleteButton').addEventListener('click', () => {
             if (activeEntryId) deleteEntry(activeEntryId);
+        });
+
+        window.addEventListener('app-language-changed', () => {
+            if (document.getElementById('detailView').hidden) {
+                renderHistory();
+            } else if (activeEntryId) {
+                openEntry(activeEntryId);
+            }
         });
 
         loadHistory();

@@ -59,6 +59,11 @@
             transition: all 0.2s ease;
         }
 
+        #appLanguage {
+            cursor: pointer;
+            font: inherit;
+        }
+
         .nav-link:hover {
             background: #eaebff;
             transform: translateY(-1px);
@@ -782,8 +787,25 @@
 
         .nav-actions {
             display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-left: 24px;
+        }
+
+        .page-links,
+        .nav-settings {
+            display: flex;
             flex-wrap: wrap;
+            align-items: center;
             gap: 10px;
+        }
+
+        .page-links .nav-link[aria-current="page"] {
+            color: #fff;
+            background: linear-gradient(120deg, #667eea, #764ba2);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.22);
         }
 
         .nav-link,
@@ -1303,7 +1325,15 @@
             }
 
             .nav-actions {
-                justify-content: flex-end;
+                width: 100%;
+                flex-wrap: wrap;
+                justify-content: space-between;
+                margin-left: 0;
+            }
+
+            .page-links,
+            .nav-settings {
+                gap: 8px;
             }
 
             .input-section,
@@ -1330,8 +1360,17 @@
         <nav class="top-nav" aria-label="Navigasi utama">
             <span class="brand">🎬 YOUTUBE KEYPOINTS</span>
             <div class="nav-actions">
-                <a class="nav-link" href="/history">🕘 Riwayat Lokal</a>
-                <button class="nav-link theme-toggle" id="themeToggle" type="button" aria-pressed="false"></button>
+                <div class="page-links" aria-label="Navigasi halaman">
+                    <a class="nav-link" href="/" aria-current="page">🏠 Extractor</a>
+                    <a class="nav-link" href="/history">🕘 Riwayat Lokal</a>
+                </div>
+                <div class="nav-settings">
+                    <select class="nav-link" id="appLanguage" aria-label="Application language">
+                        <option value="id">Bahasa Indonesia</option>
+                        <option value="en">English</option>
+                    </select>
+                    <button class="nav-link theme-toggle" id="themeToggle" type="button" aria-pressed="false"></button>
+                </div>
             </div>
         </nav>
 
@@ -1360,7 +1399,7 @@
         </section>
 
         <section class="result-section" id="resultSection" style="display: none;">
-            <div class="video-info" id="videoInfo"></div>
+            <div class="video-info" id="videoInfo" data-no-translate></div>
             <div class="export-container" aria-label="Export transcript and key points">
                 <button class="copy-btn" onclick="exportResults('txt')"><span>📄</span><span>Export TXT</span></button>
                 <button class="copy-btn" onclick="exportResults('md')"><span>📝</span><span>Export Markdown</span></button>
@@ -1375,7 +1414,7 @@
                             <span>Copy Transcript</span>
                         </button>
                     </div>
-                    <div class="transcript-box" id="transcriptBox"></div>
+                    <div class="transcript-box" id="transcriptBox" data-no-translate></div>
                 </section>
 
                 <section class="key-points-column">
@@ -1442,7 +1481,7 @@
                             <span>Copy Hasil</span>
                         </button>
                     </div>
-                    <div class="key-points-box" id="keyPointsBox" style="display: none;"></div>
+                    <div class="key-points-box" id="keyPointsBox" data-no-translate style="display: none;"></div>
                 </section>
             </div>
         </section>
@@ -1453,6 +1492,7 @@
     </div>
     </main>
 
+    <script src="{{ url_for('static', filename='i18n.js') }}"></script>
     <script>
         const THEME_STORAGE_KEY = 'youtubeKeyPointsTheme';
         let currentVideoTitle = '';
@@ -1469,8 +1509,10 @@
         function updateThemeToggle() {
             const isDark = document.documentElement.dataset.theme === 'dark';
             const toggle = document.getElementById('themeToggle');
-            toggle.textContent = isDark ? '☀️ Mode terang' : '🌙 Mode gelap';
-            toggle.setAttribute('aria-label', isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap');
+            toggle.textContent = window.translateAppText(isDark ? '☀️ Mode terang' : '🌙 Mode gelap');
+            toggle.setAttribute('aria-label', window.translateAppText(
+                isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap'
+            ));
             toggle.setAttribute('aria-pressed', String(isDark));
         }
 
@@ -1488,7 +1530,9 @@
             const outputTitle = document.getElementById('outputTitle');
             const selectedOption = promptTypeSelect.selectedOptions[0];
             customPromptField.style.display = promptTypeSelect.value === 'custom' ? 'block' : 'none';
-            outputTitle.textContent = `✨ ${promptTypeSelect.value === 'custom' ? 'Hasil Kustom' : selectedOption.textContent}`;
+            outputTitle.textContent = `✨ ${window.translateAppText(
+                promptTypeSelect.value === 'custom' ? 'Hasil Kustom' : selectedOption.textContent
+            )}`;
         }
 
         function updateBrowserUrl(url) {
@@ -1707,11 +1751,11 @@
                 strong.textContent = `${label}:`;
                 videoInfo.append(strong, document.createTextNode(` ${value}`), document.createElement('br'));
             };
-            addInfoLine('Title', currentVideoTitle || '-');
-            addInfoLine('Channel', currentVideoChannel || '-');
+            addInfoLine(window.translateAppText('Title'), currentVideoTitle || '-');
+            addInfoLine(window.translateAppText('Channel'), currentVideoChannel || '-');
             addInfoLine('Video ID', videoId);
             const languageLabel = document.createElement('strong');
-            languageLabel.textContent = 'Language:';
+            languageLabel.textContent = window.translateAppText('Language:');
             videoInfo.append(
                 languageLabel,
                 document.createTextNode(` ${language.language} (${language.language_code})`)
@@ -2051,6 +2095,7 @@
             }
         });
         document.getElementById('promptTypeSelect').addEventListener('change', updatePromptControls);
+        window.addEventListener('app-language-changed', updatePromptControls);
         updatePromptControls();
 
         // Auto-submit jika ada parameter URL (misal: /?url=https://youtube.com/watch?v=...)

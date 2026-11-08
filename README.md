@@ -17,6 +17,7 @@ A full-stack Flask application that extracts subtitles from YouTube videos and g
 - ✂️ **Smart Chunking**: Automatically breaks down long transcripts to bypass AI token limits and ensure comprehensive, high-quality summaries.
 - 🎨 **Modern UI**: Responsive extractor and history pages share a consistent, polished card-based design.
 - 🌙 **Dark Mode**: Toggle light and dark themes throughout the application; the preference is shared across pages and saved between visits.
+- **Interface Language**: Switch between English and Indonesian; the preference is shared across pages and saved between visits.
 - 📋 **One-Click Copy**: Easily copy transcripts and generated key points to the clipboard.
 - 📥 **Export Results**: Download the transcript and generated key points together as a TXT or Markdown file.
 - 🚀 **RESTful API**: Clean and well-documented API endpoints for easy integration.
@@ -77,13 +78,14 @@ The application will be available at: `http://localhost:5000`
 
 ### Web Interface
 1. Open your browser and go to `http://localhost:5000`.
-2. Enter a YouTube URL in the input field *(or append `?url=YOUTUBE_LINK` to the address bar to auto-load)*.
-3. Click **"Check Languages"** to see available subtitle languages.
-4. Select your preferred language from the interactive grid.
-5. Click **"Extract Subtitles"** to retrieve the transcript.
-6. Choose an AI model and output language, then select an output format or enter a custom prompt. Toggle **Chunking** for long videos if needed.
-7. Click **"Generate Key Points"** and copy the result as needed, or download the transcript and result together as a TXT or Markdown file.
-8. Open **"Riwayat Lokal"** to search, reopen, and delete saved transcripts and key points.
+2. Use the language selector in the top navigation to switch between English and Indonesian.
+3. Enter a YouTube URL in the input field *(or append `?url=YOUTUBE_LINK` to the address bar to auto-load)*.
+4. Click **"Check Languages"** to see available subtitle languages.
+5. Select your preferred subtitle language from the interactive grid.
+6. Click **"Extract Subtitles"** to retrieve the transcript.
+7. Choose an AI model and output language, then select an output format or enter a custom prompt. Toggle **Chunking** for long videos if needed.
+8. Click **"Generate Key Points"** and copy the result as needed, or download the transcript and result together as a TXT or Markdown file.
+9. Open **"Local History"** to search, reopen, and delete saved transcripts and key points.
 
 💡 *Pro Tip:* The browser URL automatically updates with the `?url=` parameter upon extraction, making it easy to bookmark or share your current session.
 
