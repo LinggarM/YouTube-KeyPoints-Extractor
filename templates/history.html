@@ -355,8 +355,21 @@
         }
 
         .detail-header {
-            align-items: flex-start;
+            display: block;
             margin-bottom: 22px;
+        }
+
+        .detail-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .detail-navigation {
+            display: flex;
+            gap: 8px;
+            margin-left: auto;
         }
 
         .detail-title {
@@ -527,6 +540,20 @@
                 align-items: stretch;
             }
 
+            .detail-toolbar {
+                flex-wrap: wrap;
+            }
+
+            .detail-navigation {
+                order: 3;
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .detail-navigation .button {
+                flex: 1;
+            }
+
             .entry-date {
                 order: -1;
             }
@@ -601,12 +628,16 @@
 
         <section class="detail-panel" id="detailView" hidden>
             <div class="detail-header">
-                <div>
+                <div class="detail-toolbar">
                     <button class="button button-muted" id="backButton" type="button">← Kembali ke riwayat</button>
-                    <h1 class="detail-title" id="detailTitle"></h1>
-                    <p class="detail-meta" id="detailMeta"></p>
+                    <nav class="detail-navigation" aria-label="Navigasi detail riwayat">
+                        <button class="button button-muted" id="previousEntry" type="button" aria-label="Riwayat sebelumnya">← Sebelumnya</button>
+                        <button class="button button-muted" id="nextEntry" type="button" aria-label="Riwayat selanjutnya">Selanjutnya →</button>
+                    </nav>
+                    <button class="button button-danger" id="detailDeleteButton" type="button">🗑 Hapus</button>
                 </div>
-                <button class="button button-danger" id="detailDeleteButton" type="button">🗑 Hapus</button>
+                <h1 class="detail-title" id="detailTitle"></h1>
+                <p class="detail-meta" id="detailMeta"></p>
             </div>
             <div class="detail-content">
                 <section class="content-section">
@@ -632,6 +663,7 @@
         let perPage = 10;
         let migrationCompleted = false;
         let pendingLoad = 0;
+        let navigatingEntry = false;
 
         function readLegacyHistory() {
             const rawHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
@@ -706,11 +738,13 @@
                 totalEntries = result.pagination.total;
                 perPage = result.pagination.per_page;
                 renderHistory();
+                return true;
             } catch (error) {
                 if (loadId !== pendingLoad) {
-                    return;
+                    return false;
                 }
                 showStorageError(error);
+                return false;
             }
         }
 
@@ -835,6 +869,7 @@
             }
 
             activeEntryId = entryId;
+            updateDetailNavigation();
             document.getElementById('listView').hidden = true;
             document.getElementById('detailView').hidden = false;
             document.getElementById('detailTitle').textContent = entry.title || 'Untitled video';
@@ -861,6 +896,57 @@
                 keyPoints.innerHTML = DOMPurify.sanitize(marked.parse(entry.keyPoints));
             } else {
                 keyPoints.textContent = entry.keyPoints || 'Key points belum dibuat untuk video ini.';
+            }
+        }
+
+        function updateDetailNavigation() {
+            const entryIndex = historyEntries.findIndex(item => item.id === activeEntryId);
+            document.getElementById('previousEntry').disabled = navigatingEntry ||
+                entryIndex < 0 || (entryIndex === 0 && currentPage <= 1);
+            document.getElementById('nextEntry').disabled = navigatingEntry ||
+                entryIndex < 0 || (
+                    entryIndex === historyEntries.length - 1 && currentPage >= totalPages
+                );
+        }
+
+        async function navigateEntry(direction) {
+            if (navigatingEntry) {
+                return;
+            }
+
+            const entryIndex = historyEntries.findIndex(item => item.id === activeEntryId);
+            if (entryIndex < 0) {
+                return;
+            }
+            const targetIndex = entryIndex + direction;
+            if (targetIndex >= 0 && targetIndex < historyEntries.length) {
+                openEntry(historyEntries[targetIndex].id);
+                return;
+            }
+
+            const targetPage = currentPage + direction;
+            if (targetPage < 1 || targetPage > totalPages) {
+                return;
+            }
+
+            const previousPage = currentPage;
+            navigatingEntry = true;
+            updateDetailNavigation();
+            currentPage = targetPage;
+            try {
+                if (!await loadHistory()) {
+                    currentPage = previousPage;
+                    return;
+                }
+                const targetEntry = direction < 0
+                    ? historyEntries[historyEntries.length - 1]
+                    : historyEntries[0];
+                if (targetEntry) {
+                    openEntry(targetEntry.id);
+                }
+            } finally {
+                navigatingEntry = false;
+                updateDetailNavigation();
             }
         }
 
@@ -948,6 +1034,8 @@
             }
         });
         document.getElementById('backButton').addEventListener('click', returnToList);
+        document.getElementById('previousEntry').addEventListener('click', () => navigateEntry(-1));
+        document.getElementById('nextEntry').addEventListener('click', () => navigateEntry(1));
         document.getElementById('detailDeleteButton').addEventListener('click', () => {
             if (activeEntryId) deleteEntry(activeEntryId);
         });

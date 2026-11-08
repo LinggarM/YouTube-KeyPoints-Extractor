@@ -88,7 +88,7 @@ The application will be available at: `http://localhost:5000`
 
 ### Riwayat Lokal
 
-Transcript and generated key points are saved in the application's SQLite database (`instance/history.sqlite3`). Open `/history` or click **"Riwayat Lokal"** to search and filter by date, language, and key points status. Results are paginated (10, 20, or 50 entries per page); click a title to read the transcript and formatted key points, or delete an entry. Existing browser-local history is imported automatically on the first visit and kept in the browser as a backup. Back up `instance/history.sqlite3` regularly; deleting the database file or the application's instance directory removes server history.
+Transcript and generated key points are saved in the application's SQLite database (`instance/history.sqlite3`). Open `/history` or click **"Riwayat Lokal"** to search and filter by date, language, and key points status. Results are paginated (10, 20, or 50 entries per page); click a title to read the transcript and formatted key points, or use the previous/next controls in the detail view to move through matching entries without returning to the list. Existing browser-local history is imported automatically on the first visit and kept in the browser as a backup. Back up `instance/history.sqlite3` regularly; deleting the database file or the application's instance directory removes server history.
 
 ### API Endpoints
 
