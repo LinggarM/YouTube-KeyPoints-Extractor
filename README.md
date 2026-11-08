@@ -16,6 +16,7 @@ A full-stack Flask application that extracts subtitles from YouTube videos and g
 - 📝 **Custom Prompt Templates**: Choose summaries, executive summaries, key points, Q&A, action items, or enter your own prompt.
 - ✂️ **Smart Chunking**: Automatically breaks down long transcripts to bypass AI token limits and ensure comprehensive, high-quality summaries.
 - 🎨 **Modern UI**: Responsive web interface with glassmorphism design and smooth animations.
+- 🌙 **Dark Mode**: Toggle light and dark themes throughout the application; the preference is shared across pages and saved between visits.
 - 📋 **One-Click Copy**: Easily copy transcripts and generated key points to the clipboard.
 - 📥 **Export Results**: Download the transcript and generated key points together as a TXT or Markdown file.
 - 🚀 **RESTful API**: Clean and well-documented API endpoints for easy integration.
@@ -88,7 +89,7 @@ The application will be available at: `http://localhost:5000`
 
 ### Riwayat Lokal
 
-Transcript, channel name, and generated key points are saved in the application's SQLite database (`instance/history.sqlite3`). Open `/history` or click **"Riwayat Lokal"** to search by title, channel, video, language, transcript, or key points and filter by date, language, and key points status. Results are paginated (10, 20, or 50 entries per page); click a title to read the transcript and formatted key points, or use the previous/next controls in the detail view to move through matching entries without returning to the list. Existing browser-local history is imported automatically on the first visit and kept in the browser as a backup. Back up `instance/history.sqlite3` regularly; deleting the database file or the application's instance directory removes server history.
+Transcript, channel name, and generated key points are saved in the application's SQLite database (`instance/history.sqlite3`). Open `/history` or click **"Riwayat Lokal"** to search by title, channel, video, language, transcript, or key points and filter by date, language, and key points status. The theme toggle is available on both the extractor and history pages; its choice is shared between pages and saved between visits, with the system theme used by default. Results are paginated (10, 20, or 50 entries per page); click a title to read the transcript and formatted key points, or use the previous/next controls in the detail view to move through matching entries without returning to the list. Existing browser-local history is imported automatically on the first visit and kept in the browser as a backup. Back up `instance/history.sqlite3` regularly; deleting the database file or the application's instance directory removes server history.
 
 ### API Endpoints
 

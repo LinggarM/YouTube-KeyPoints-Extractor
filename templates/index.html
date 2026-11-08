@@ -9,6 +9,12 @@
         href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎬</text></svg>">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script>
+        const savedTheme = localStorage.getItem('youtubeKeyPointsTheme');
+        document.documentElement.dataset.theme = savedTheme === 'dark' || savedTheme === 'light'
+            ? savedTheme
+            : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    </script>
     <style>
         * {
             margin: 0;
@@ -35,8 +41,15 @@
 
         .top-nav {
             display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
             justify-content: flex-end;
             margin-bottom: 18px;
+        }
+
+        .theme-toggle {
+            font: inherit;
+            cursor: pointer;
         }
 
         .nav-link {
@@ -537,6 +550,168 @@
             margin-top: 20px
         }
 
+        html {
+            color-scheme: light;
+        }
+
+        html[data-theme="dark"] {
+            color-scheme: dark;
+        }
+
+        html[data-theme="dark"] body {
+            background: linear-gradient(135deg, #171b32 0%, #302344 100%);
+        }
+
+        html[data-theme="dark"] .container {
+            background: rgba(27, 30, 48, 0.97);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        html[data-theme="dark"] .nav-link {
+            border-color: #444960;
+            color: #c4c6ff;
+            background: #30324f;
+        }
+
+        html[data-theme="dark"] .nav-link:hover {
+            background: #3a3d5d;
+        }
+
+        html[data-theme="dark"] .example,
+        html[data-theme="dark"] .prompt-help {
+            color: #b0b5ca;
+        }
+
+        html[data-theme="dark"] input[type="url"],
+        html[data-theme="dark"] .model-select,
+        html[data-theme="dark"] .custom-prompt {
+            border-color: #444960;
+            background: #25293d;
+            color: #e1e4f0;
+        }
+
+        html[data-theme="dark"] input[type="url"]::placeholder,
+        html[data-theme="dark"] .custom-prompt::placeholder {
+            color: #9299b2;
+        }
+
+        html[data-theme="dark"] .model-selection label,
+        html[data-theme="dark"] .key-points-section h3,
+        html[data-theme="dark"] .column-title {
+            color: #e2e4f1;
+        }
+
+        html[data-theme="dark"] .model-selection label[for="useChunking"] {
+            color: #d3d6e5 !important;
+        }
+
+        html[data-theme="dark"] .loading {
+            color: #b8baff;
+        }
+
+        html[data-theme="dark"] .spinner {
+            border-color: #3d4259;
+            border-top-color: #9295e8;
+        }
+
+        html[data-theme="dark"] .video-info,
+        html[data-theme="dark"] .result-header {
+            background: #30354b;
+            color: #dce0ef;
+        }
+
+        html[data-theme="dark"] .transcript-box {
+            border-color: #3b4058;
+            background: #202437;
+            color: #d2d6e5;
+        }
+
+        html[data-theme="dark"] .transcript-box::-webkit-scrollbar-track,
+        html[data-theme="dark"] .key-points-box::-webkit-scrollbar-track {
+            background: #2b3045;
+        }
+
+        html[data-theme="dark"] .key-points-section {
+            border-color: rgba(91, 190, 132, 0.25);
+            background: rgba(40, 167, 69, 0.08);
+        }
+
+        html[data-theme="dark"] .key-points-box {
+            border-color: #3d5949;
+            background: #202b2a;
+            color: #d2e3d8;
+        }
+
+        html[data-theme="dark"] #keyPointsBox th,
+        html[data-theme="dark"] #keyPointsBox td {
+            border-color: #3d5949;
+        }
+
+        html[data-theme="dark"] #keyPointsBox th {
+            background: #293d35;
+        }
+
+        html[data-theme="dark"] .language-section {
+            border-color: rgba(130, 137, 232, 0.26);
+            background: rgba(102, 126, 234, 0.08);
+        }
+
+        html[data-theme="dark"] .language-section h3 {
+            color: #e2e4f1;
+        }
+
+        html[data-theme="dark"] .language-option {
+            border-color: #444960;
+            background: #25293d;
+            color: #dce0ef;
+        }
+
+        html[data-theme="dark"] .language-option:hover {
+            border-color: #777de0;
+            background: #30344d;
+        }
+
+        html[data-theme="dark"] .language-option.selected {
+            border-color: #777de0;
+            background: #555bc0;
+            color: white;
+        }
+
+        html[data-theme="dark"] .language-badge {
+            background: rgba(162, 166, 255, 0.16);
+            color: #c4c6ff;
+        }
+
+        html[data-theme="dark"] .language-option.selected .language-badge {
+            color: white;
+        }
+
+        html[data-theme="dark"] .extract-section {
+            border-top-color: rgba(130, 137, 232, 0.24);
+        }
+
+        html[data-theme="dark"] code {
+            background-color: #383d54;
+            color: #f0a3ce;
+        }
+
+        html[data-theme="dark"] .error {
+            border-color: #68414c;
+            background: #352832;
+            color: #ffafb8;
+        }
+
+        html[data-theme="dark"] .success {
+            border-color: #3d5949;
+            background: #26372f;
+            color: #a9e3bd;
+        }
+
+        html[data-theme="dark"] .swal2-popup {
+            background: #25293d !important;
+            color: #e4e7f2 !important;
+        }
+
         code {
             font-family: monospace;
             background-color: #f0f0f0;
@@ -587,6 +762,7 @@
     <div class="container">
         <nav class="top-nav" aria-label="Navigasi utama">
             <a class="nav-link" href="/history">🕘 Riwayat Lokal</a>
+            <button class="nav-link theme-toggle" id="themeToggle" type="button" aria-pressed="false"></button>
         </nav>
         <h1>🎬 YouTube KeyPoints Extractor</h1>
 
@@ -703,6 +879,7 @@
     </div>
 
     <script>
+        const THEME_STORAGE_KEY = 'youtubeKeyPointsTheme';
         let currentVideoTitle = '';
         let currentVideoChannel = '';
         let currentVideoId = '';
@@ -713,6 +890,22 @@
         let currentKeyPoints = '';
         let availableLanguages = [];
         let selectedLanguage = null;
+
+        function updateThemeToggle() {
+            const isDark = document.documentElement.dataset.theme === 'dark';
+            const toggle = document.getElementById('themeToggle');
+            toggle.textContent = isDark ? '☀️ Mode terang' : '🌙 Mode gelap';
+            toggle.setAttribute('aria-label', isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap');
+            toggle.setAttribute('aria-pressed', String(isDark));
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.dataset.theme = nextTheme;
+            localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+            updateThemeToggle();
+        });
+        updateThemeToggle();
 
         function updatePromptControls() {
             const promptTypeSelect = document.getElementById('promptTypeSelect');

@@ -10,6 +10,12 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.6/dist/purify.min.js"></script>
+    <script>
+        const savedTheme = localStorage.getItem('youtubeKeyPointsTheme');
+        document.documentElement.dataset.theme = savedTheme === 'dark' || savedTheme === 'light'
+            ? savedTheme
+            : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    </script>
     <style>
         * {
             box-sizing: border-box;
@@ -47,6 +53,7 @@
         }
 
         .topbar {
+            flex-wrap: wrap;
             margin-bottom: 36px;
         }
 
@@ -503,6 +510,175 @@
             background: #f5f6fc;
         }
 
+        html {
+            color-scheme: light;
+        }
+
+        html[data-theme="dark"] {
+            color-scheme: dark;
+        }
+
+        html[data-theme="dark"] body {
+            color: #e4e7f2;
+            background: linear-gradient(135deg, #171b32 0%, #302344 100%);
+        }
+
+        html[data-theme="dark"] .page {
+            border-color: rgba(165, 170, 212, 0.18);
+            background: rgba(27, 30, 48, 0.97);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        html[data-theme="dark"] .brand,
+        html[data-theme="dark"] .eyebrow {
+            color: #a7a9ff;
+        }
+
+        html[data-theme="dark"] .nav-link {
+            color: #c4c6ff;
+            background: #30324f;
+        }
+
+        html[data-theme="dark"] .button-muted {
+            color: #d3d6e5;
+            background: #35394e;
+        }
+
+        html[data-theme="dark"] .button-danger {
+            color: #ffafb8;
+            background: #492d3a;
+        }
+
+        html[data-theme="dark"] h1,
+        html[data-theme="dark"] .detail-title {
+            color: #eff0fa;
+        }
+
+        html[data-theme="dark"] .intro,
+        html[data-theme="dark"] .entry-preview,
+        html[data-theme="dark"] .pagination-info,
+        html[data-theme="dark"] .detail-meta {
+            color: #b0b5ca;
+        }
+
+        html[data-theme="dark"] .detail-meta a {
+            color: #b8baff;
+        }
+
+        html[data-theme="dark"] .filter-control,
+        html[data-theme="dark"] .search-input,
+        html[data-theme="dark"] .page-size {
+            border-color: #444960;
+            background: #25293d;
+            color: #e1e4f0;
+        }
+
+        html[data-theme="dark"] .search-icon,
+        html[data-theme="dark"] .result-count {
+            color: #aeb3c9;
+        }
+
+        html[data-theme="dark"] .entry-card {
+            border-color: #383d55;
+            background: linear-gradient(135deg, #25293d 0%, #222638 100%);
+        }
+
+        html[data-theme="dark"] .entry-card:hover {
+            border-color: #656bb0;
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.2);
+        }
+
+        html[data-theme="dark"] .entry-title {
+            color: #e7e9f5;
+        }
+
+        html[data-theme="dark"] .entry-title-button:hover {
+            color: #b8baff;
+        }
+
+        html[data-theme="dark"] .entry-date {
+            color: #a4a9bf;
+        }
+
+        html[data-theme="dark"] .meta-chip {
+            color: #c2c6d9;
+            background: #383d54;
+        }
+
+        html[data-theme="dark"] .empty-state,
+        html[data-theme="dark"] .error-state {
+            border-color: #41465d;
+            background: #25293d;
+        }
+
+        html[data-theme="dark"] .empty-state h2,
+        html[data-theme="dark"] .error-state h2 {
+            color: #e7e9f5;
+        }
+
+        html[data-theme="dark"] .empty-state p,
+        html[data-theme="dark"] .error-state p {
+            color: #b0b5ca;
+        }
+
+        html[data-theme="dark"] .error-state {
+            border-color: #68414c;
+            background: #352832;
+        }
+
+        html[data-theme="dark"] .error-state h2 {
+            color: #ffafb8;
+        }
+
+        html[data-theme="dark"] .content-section {
+            border-color: #3b4058;
+            background: #25293d;
+        }
+
+        html[data-theme="dark"] .content-section h2 {
+            border-bottom-color: #3b4058;
+            color: #d9dced;
+            background: #2d3248;
+        }
+
+        html[data-theme="dark"] .content-text {
+            color: #d2d6e5;
+        }
+
+        html[data-theme="dark"] .markdown-content h1,
+        html[data-theme="dark"] .markdown-content h2,
+        html[data-theme="dark"] .markdown-content h3,
+        html[data-theme="dark"] .markdown-content h4 {
+            color: #e2e4f1;
+        }
+
+        html[data-theme="dark"] .markdown-content blockquote {
+            background: #30334c;
+            color: #c3c7db;
+        }
+
+        html[data-theme="dark"] .markdown-content code {
+            background: #383d54;
+        }
+
+        html[data-theme="dark"] .markdown-content pre {
+            background: #1d2132;
+        }
+
+        html[data-theme="dark"] .markdown-content th,
+        html[data-theme="dark"] .markdown-content td {
+            border-color: #444960;
+        }
+
+        html[data-theme="dark"] .markdown-content th {
+            background: #30354b;
+        }
+
+        html[data-theme="dark"] .swal2-popup {
+            background: #25293d;
+            color: #e4e7f2;
+        }
+
         [hidden] {
             display: none !important;
         }
@@ -570,6 +746,7 @@
         <nav class="topbar" aria-label="Navigasi utama">
             <span class="brand">🎬 YOUTUBE KEYPOINTS</span>
             <a class="nav-link" href="/">← Kembali ke Extractor</a>
+            <button class="button button-muted" id="themeToggle" type="button" aria-pressed="false"></button>
         </nav>
 
         <section id="listView">
@@ -655,6 +832,7 @@
     <script>
         const HISTORY_STORAGE_KEY = 'youtubeKeyPointsHistory';
         const HISTORY_IMPORT_TOKEN_KEY = 'youtubeKeyPointsHistoryImportToken';
+        const THEME_STORAGE_KEY = 'youtubeKeyPointsTheme';
         let historyEntries = [];
         let activeEntryId = null;
         let currentPage = 1;
@@ -664,6 +842,22 @@
         let migrationCompleted = false;
         let pendingLoad = 0;
         let navigatingEntry = false;
+
+        function updateThemeToggle() {
+            const isDark = document.documentElement.dataset.theme === 'dark';
+            const toggle = document.getElementById('themeToggle');
+            toggle.textContent = isDark ? '☀️ Mode terang' : '🌙 Mode gelap';
+            toggle.setAttribute('aria-label', isDark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap');
+            toggle.setAttribute('aria-pressed', String(isDark));
+        }
+
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const nextTheme = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+            document.documentElement.dataset.theme = nextTheme;
+            localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+            updateThemeToggle();
+        });
+        updateThemeToggle();
 
         function readLegacyHistory() {
             const rawHistory = localStorage.getItem(HISTORY_STORAGE_KEY);
