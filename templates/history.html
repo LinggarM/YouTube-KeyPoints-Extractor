@@ -57,6 +57,12 @@
             margin-bottom: 36px;
         }
 
+        .nav-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
         .brand {
             color: #5e63c8;
             font-size: 14px;
@@ -745,8 +751,10 @@
     <main class="page">
         <nav class="topbar" aria-label="Navigasi utama">
             <span class="brand">🎬 YOUTUBE KEYPOINTS</span>
-            <a class="nav-link" href="/">← Kembali ke Extractor</a>
-            <button class="button button-muted" id="themeToggle" type="button" aria-pressed="false"></button>
+            <div class="nav-actions">
+                <a class="nav-link" href="/">← Kembali ke Extractor</a>
+                <button class="button button-muted" id="themeToggle" type="button" aria-pressed="false"></button>
+            </div>
         </nav>
 
         <section id="listView">

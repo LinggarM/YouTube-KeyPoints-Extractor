@@ -15,7 +15,7 @@ A full-stack Flask application that extracts subtitles from YouTube videos and g
 - 🧠 **AI-Powered Summarization**: Generate key insights using Groq or Google AI Studio models.
 - 📝 **Custom Prompt Templates**: Choose summaries, executive summaries, key points, Q&A, action items, or enter your own prompt.
 - ✂️ **Smart Chunking**: Automatically breaks down long transcripts to bypass AI token limits and ensure comprehensive, high-quality summaries.
-- 🎨 **Modern UI**: Responsive web interface with glassmorphism design and smooth animations.
+- 🎨 **Modern UI**: Responsive extractor and history pages share a consistent, polished card-based design.
 - 🌙 **Dark Mode**: Toggle light and dark themes throughout the application; the preference is shared across pages and saved between visits.
 - 📋 **One-Click Copy**: Easily copy transcripts and generated key points to the clipboard.
 - 📥 **Export Results**: Download the transcript and generated key points together as a TXT or Markdown file.

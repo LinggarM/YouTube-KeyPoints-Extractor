@@ -22,13 +22,6 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -755,18 +748,600 @@
                 align-self: center;
             }
         }
+        body {
+            min-height: 100vh;
+            padding: 28px 20px;
+            color: #252943;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .page {
+            max-width: 1080px;
+            min-height: calc(100vh - 56px);
+            margin: 0 auto;
+            padding: 34px;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.97);
+            box-shadow: 0 24px 60px rgba(34, 30, 78, 0.2);
+        }
+
+        .top-nav {
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 36px;
+        }
+
+        .brand {
+            color: #5e63c8;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .nav-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .nav-link,
+        .btn,
+        .copy-btn {
+            display: inline-flex;
+            min-height: 42px;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border: 0;
+            border-radius: 11px;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 650;
+            text-decoration: none;
+            cursor: pointer;
+            transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        }
+
+        .nav-link {
+            color: #5b62bd;
+            background: #f0f1ff;
+        }
+
+        .nav-link:hover,
+        .btn:hover,
+        .copy-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .theme-toggle {
+            font: inherit;
+        }
+
+        .page-header {
+            margin-bottom: 28px;
+        }
+
+        .eyebrow {
+            margin-bottom: 9px;
+            color: #7478c9;
+            font-size: 12px;
+            font-weight: 750;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+
+        .page-header h1 {
+            margin-bottom: 10px;
+            color: #292c47;
+            font-size: clamp(30px, 5vw, 42px);
+            line-height: 1.15;
+            text-align: left;
+            background: none;
+            -webkit-text-fill-color: currentColor;
+        }
+
+        .intro {
+            max-width: 680px;
+            color: #737991;
+            font-size: 15px;
+            line-height: 1.65;
+        }
+
+        .input-section {
+            margin-bottom: 24px;
+            padding: 22px;
+            border: 1px solid #e8eaf2;
+            border-radius: 17px;
+            background: #fbfbfe;
+        }
+
+        .input-group {
+            align-items: stretch;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+
+        input[type="url"] {
+            min-width: 0;
+            min-height: 52px;
+            padding: 13px 16px;
+            border: 1px solid #e4e6f0;
+            border-radius: 14px;
+            outline: none;
+            background: white;
+            color: #292c47;
+            font: inherit;
+            font-size: 15px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        input[type="url"]:focus,
+        .model-select:focus,
+        .custom-prompt:focus {
+            border-color: #8589e8;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.12);
+        }
+
+        .example,
+        .prompt-help {
+            color: #777d95;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .btn,
+        .copy-btn {
+            min-width: 0;
+            color: white;
+            background: linear-gradient(120deg, #667eea, #764ba2);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.18);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(120deg, #667eea, #764ba2);
+        }
+
+        .copy-btn {
+            padding: 9px 13px;
+            font-size: 13px;
+        }
+
+        .language-section {
+            margin-top: 20px;
+            padding: 20px;
+            border: 1px solid #e8eaf2;
+            border-radius: 16px;
+            background: white;
+        }
+
+        .language-section h3 {
+            margin-bottom: 14px;
+            color: #454967;
+            font-size: 16px;
+        }
+
+        .language-grid {
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 10px;
+            margin-bottom: 18px;
+        }
+
+        .language-option {
+            min-width: 0;
+            padding: 12px 14px;
+            border: 1px solid #e4e6f0;
+            border-radius: 12px;
+            background: #fbfbfe;
+            color: #535a74;
+        }
+
+        .language-option:hover {
+            border-color: #d7d9f7;
+            background: #f6f6ff;
+        }
+
+        .language-option.selected {
+            border-color: #8589e8;
+            background: #f0f1ff;
+            color: #454a9d;
+        }
+
+        .language-option.selected .language-badge {
+            background: #e2e3ff;
+            color: #555bc0;
+        }
+
+        .language-badge {
+            border-radius: 20px;
+            background: #f0f1f8;
+            color: #656b85;
+        }
+
+        .extract-section {
+            padding-top: 16px;
+            border-top: 1px solid #eceef5;
+        }
+
+        .result-section {
+            margin-top: 28px;
+        }
+
+        .video-info {
+            display: block;
+            margin-bottom: 12px;
+            padding: 16px 18px;
+            border: 1px solid #e8eaf2;
+            border-left: 4px solid #8589e8;
+            border-radius: 14px;
+            background: #f8f8fc;
+            color: #535a74;
+            font-size: 14px;
+            line-height: 1.8;
+            overflow-wrap: anywhere;
+        }
+
+        .export-container {
+            margin: 12px 0 18px;
+        }
+
+        .two-column {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr);
+            gap: 18px;
+            margin-top: 0;
+        }
+
+        .transcript-column,
+        .key-points-column {
+            min-width: 0;
+            padding: 20px;
+            border: 1px solid #e8eaf2;
+            border-radius: 17px;
+            background: white;
+        }
+
+        .column-header {
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .column-title {
+            color: #454967;
+            font-size: 16px;
+        }
+
+        .transcript-box,
+        .key-points-box {
+            max-height: 460px;
+            margin: 0;
+            padding: 18px;
+            border: 1px solid #e8eaf2;
+            border-radius: 12px;
+            background: #fbfbfe;
+            color: #41455e;
+            font-size: 14px;
+            line-height: 1.75;
+        }
+
+        .key-points-section {
+            margin-top: 0;
+            padding: 17px;
+            border: 1px solid #e8eaf2;
+            border-radius: 14px;
+            background: #f8f8fc;
+        }
+
+        .model-selection {
+            margin-bottom: 16px;
+        }
+
+        .model-selection label {
+            margin-bottom: 7px;
+            color: #535a74;
+            font-size: 13px;
+        }
+
+        .model-select,
+        .custom-prompt {
+            min-height: 44px;
+            padding: 10px 12px;
+            border: 1px solid #e4e6f0;
+            border-radius: 11px;
+            outline: none;
+            background: white;
+            color: #535a74;
+            font: inherit;
+            font-size: 14px;
+        }
+
+        .custom-prompt {
+            min-height: 120px;
+        }
+
+        .prompt-help {
+            margin-top: 7px;
+        }
+
+        .keypoints-header {
+            margin-top: 18px;
+        }
+
+        .key-points-box {
+            margin-top: 0;
+            border-color: #e8eaf2;
+            background: #fbfbfe;
+            white-space: normal;
+        }
+
+        #keyPointsBox th,
+        #keyPointsBox td {
+            border-color: #e4e6f0;
+        }
+
+        #keyPointsBox th {
+            background: #f5f6fc;
+        }
+
+        .loading {
+            color: #7478c9;
+        }
+
+        .spinner {
+            border-color: #e4e6f0;
+            border-top-color: #7478c9;
+        }
+
+        .error,
+        .success {
+            padding: 14px 16px;
+            border-radius: 12px;
+            font-size: 14px;
+        }
+
+        .error {
+            border: 1px solid #ffd7dc;
+            background: #fff8f8;
+            color: #a63c4a;
+        }
+
+        .success {
+            border: 1px solid #d5ead9;
+            background: #f5fbf6;
+            color: #39734b;
+        }
+
+        .swal2-popup {
+            border-radius: 17px !important;
+        }
+
+        html {
+            color-scheme: light;
+        }
+
+        html[data-theme="dark"] {
+            color-scheme: dark;
+        }
+
+        html[data-theme="dark"] body {
+            color: #e4e7f2;
+            background: linear-gradient(135deg, #171b32 0%, #302344 100%);
+        }
+
+        html[data-theme="dark"] .page {
+            border-color: rgba(165, 170, 212, 0.18);
+            background: rgba(27, 30, 48, 0.97);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        html[data-theme="dark"] .brand,
+        html[data-theme="dark"] .eyebrow {
+            color: #a7a9ff;
+        }
+
+        html[data-theme="dark"] .page-header h1,
+        html[data-theme="dark"] .language-section h3 {
+            color: #eff0fa;
+        }
+
+        html[data-theme="dark"] .intro,
+        html[data-theme="dark"] .example,
+        html[data-theme="dark"] .prompt-help {
+            color: #b0b5ca;
+        }
+
+        html[data-theme="dark"] .nav-link {
+            color: #c4c6ff;
+            background: #30324f;
+        }
+
+        html[data-theme="dark"] .input-section,
+        html[data-theme="dark"] .transcript-column,
+        html[data-theme="dark"] .key-points-column,
+        html[data-theme="dark"] .language-section {
+            border-color: #3b4058;
+            background: #25293d;
+        }
+
+        html[data-theme="dark"] input[type="url"],
+        html[data-theme="dark"] .model-select,
+        html[data-theme="dark"] .custom-prompt {
+            border-color: #444960;
+            background: #202437;
+            color: #e1e4f0;
+        }
+
+        html[data-theme="dark"] input[type="url"]::placeholder,
+        html[data-theme="dark"] .custom-prompt::placeholder {
+            color: #9299b2;
+        }
+
+        html[data-theme="dark"] .language-option {
+            border-color: #444960;
+            background: #202437;
+            color: #dce0ef;
+        }
+
+        html[data-theme="dark"] .language-option:hover {
+            border-color: #656bb0;
+            background: #30344d;
+        }
+
+        html[data-theme="dark"] .language-option.selected {
+            border-color: #777de0;
+            background: #454b91;
+            color: #f2f2ff;
+        }
+
+        html[data-theme="dark"] .language-option.selected .language-badge {
+            background: #5a60a8;
+            color: #f2f2ff;
+        }
+
+        html[data-theme="dark"] .language-badge {
+            background: #383d54;
+            color: #c2c6d9;
+        }
+
+        html[data-theme="dark"] .extract-section {
+            border-top-color: #3b4058;
+        }
+
+        html[data-theme="dark"] .video-info,
+        html[data-theme="dark"] .key-points-section {
+            border-color: #3b4058;
+            background: #2d3248;
+            color: #d2d6e5;
+        }
+
+        html[data-theme="dark"] .transcript-box,
+        html[data-theme="dark"] .key-points-box {
+            border-color: #3b4058;
+            background: #202437;
+            color: #d2d6e5;
+        }
+
+        html[data-theme="dark"] .column-title,
+        html[data-theme="dark"] .model-selection label {
+            color: #d9dced;
+        }
+
+        html[data-theme="dark"] .model-selection label[for="useChunking"] {
+            color: #d3d6e5 !important;
+        }
+
+        html[data-theme="dark"] #keyPointsBox th,
+        html[data-theme="dark"] #keyPointsBox td {
+            border-color: #444960;
+        }
+
+        html[data-theme="dark"] #keyPointsBox th {
+            background: #30354b;
+        }
+
+        html[data-theme="dark"] .loading {
+            color: #b8baff;
+        }
+
+        html[data-theme="dark"] .spinner {
+            border-color: #3d4259;
+            border-top-color: #9295e8;
+        }
+
+        html[data-theme="dark"] .error {
+            border-color: #68414c;
+            background: #352832;
+            color: #ffafb8;
+        }
+
+        html[data-theme="dark"] .success {
+            border-color: #3d5949;
+            background: #26372f;
+            color: #a9e3bd;
+        }
+
+        html[data-theme="dark"] .swal2-popup {
+            background: #25293d !important;
+            color: #e4e7f2 !important;
+        }
+
+        @media (max-width: 760px) {
+            .page {
+                min-height: calc(100vh - 24px);
+                padding: 22px 17px;
+                border-radius: 18px;
+            }
+
+            .top-nav {
+                margin-bottom: 28px;
+            }
+
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+        }
+
+        @media (max-width: 520px) {
+            body {
+                padding: 12px;
+            }
+
+            .top-nav {
+                align-items: flex-start;
+            }
+
+            .nav-actions {
+                justify-content: flex-end;
+            }
+
+            .input-section,
+            .transcript-column,
+            .key-points-column {
+                padding: 15px;
+            }
+
+            .column-header {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .export-container {
+                justify-content: flex-start;
+            }
+        }
+
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <main class="page">
         <nav class="top-nav" aria-label="Navigasi utama">
-            <a class="nav-link" href="/history">🕘 Riwayat Lokal</a>
-            <button class="nav-link theme-toggle" id="themeToggle" type="button" aria-pressed="false"></button>
+            <span class="brand">🎬 YOUTUBE KEYPOINTS</span>
+            <div class="nav-actions">
+                <a class="nav-link" href="/history">🕘 Riwayat Lokal</a>
+                <button class="nav-link theme-toggle" id="themeToggle" type="button" aria-pressed="false"></button>
+            </div>
         </nav>
-        <h1>🎬 YouTube KeyPoints Extractor</h1>
 
-        <div class="input-section">
+        <header class="page-header">
+            <p class="eyebrow">TRANSKRIP & RINGKASAN VIDEO</p>
+            <h1>YouTube KeyPoints Extractor</h1>
+            <p class="intro">Ekstrak subtitle dari video YouTube, lalu susun menjadi ringkasan dan poin-poin penting.</p>
+        </header>
+
+        <section class="input-section">
             <div class="input-group">
                 <input type="url" id="urlInput" placeholder="Enter YouTube URL here..." />
                 <button class="btn" onclick="checkLanguages()">Check Languages</button>
@@ -782,9 +1357,9 @@
                     <button class="btn" onclick="extractSubtitles()">Extract Subtitles</button>
                 </div>
             </div>
-        </div>
+        </section>
 
-        <div class="result-section" id="resultSection" style="display: none;">
+        <section class="result-section" id="resultSection" style="display: none;">
             <div class="video-info" id="videoInfo"></div>
             <div class="export-container" aria-label="Export transcript and key points">
                 <button class="copy-btn" onclick="exportResults('txt')"><span>📄</span><span>Export TXT</span></button>
@@ -792,7 +1367,7 @@
             </div>
 
             <div class="two-column">
-                <div class="transcript-column">
+                <section class="transcript-column">
                     <div class="column-header">
                         <div class="column-title">📝 Transcript</div>
                         <button class="copy-btn" onclick="copyTranscript()">
@@ -801,9 +1376,9 @@
                         </button>
                     </div>
                     <div class="transcript-box" id="transcriptBox"></div>
-                </div>
+                </section>
 
-                <div class="key-points-column">
+                <section class="key-points-column">
 
                     <div class="key-points-section">
                         <div class="model-selection">
@@ -868,15 +1443,15 @@
                         </button>
                     </div>
                     <div class="key-points-box" id="keyPointsBox" style="display: none;"></div>
-                </div>
+                </section>
             </div>
-        </div>
+        </section>
 
         <div class="loading" id="loading">
             <div class="spinner"></div>
             <span id="loadingText">Extracting subtitles...</span>
-        </div>
     </div>
+    </main>
 
     <script>
         const THEME_STORAGE_KEY = 'youtubeKeyPointsTheme';
