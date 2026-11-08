@@ -704,6 +704,7 @@
 
     <script>
         let currentVideoTitle = '';
+        let currentVideoChannel = '';
         let currentVideoId = '';
         let currentLanguage = '';
         let currentHistoryId = '';
@@ -860,12 +861,17 @@
             try {
                 // 🔴 ambil title dulu
                 let videoTitle = '';
+                let videoChannel = '';
                 try {
-                    const oembedRes = await fetch(`https://www.youtube.com/oembed?url=${url}&format=json`);
+                    const oembedUrl = new URL('https://www.youtube.com/oembed');
+                    oembedUrl.searchParams.set('url', url);
+                    oembedUrl.searchParams.set('format', 'json');
+                    const oembedRes = await fetch(oembedUrl);
                     const oembedData = await oembedRes.json();
                     videoTitle = oembedData.title;
+                    videoChannel = oembedData.author_name;
                 } catch (e) {
-                    console.warn('Failed to fetch title:', e);
+                    console.warn('Failed to fetch video metadata:', e);
                 }
 
                 // 🔴 ambil transcript
@@ -877,7 +883,8 @@
                     body: JSON.stringify({
                         url: url,
                         language_code: selectedLanguage,
-                        video_title: videoTitle
+                        video_title: videoTitle,
+                        video_channel: videoChannel
                     })
                 });
 
@@ -886,6 +893,7 @@
 
                 if (data.success) {
                     currentVideoTitle = data.video_title || videoTitle;
+                    currentVideoChannel = data.video_channel || videoChannel;
 
                     const selectedLang = availableLanguages.find(
                         lang => lang.language_code === selectedLanguage
@@ -925,12 +933,27 @@
             currentHistoryCreatedAt = new Date().toISOString();
             currentKeyPoints = '';
             transcriptBox.textContent = transcript;
-            videoInfo.innerHTML = `
-                <strong>Title:</strong> ${currentVideoTitle || '-'}<br>
-                <strong>Video ID:</strong> ${videoId}<br>
-                <strong>Language:</strong> ${language.language} (${language.language_code})
-                ${language.is_generated ? '<span class="language-badge">Auto-generated</span>' : ''}
-            `;
+            videoInfo.replaceChildren();
+            const addInfoLine = (label, value) => {
+                const strong = document.createElement('strong');
+                strong.textContent = `${label}:`;
+                videoInfo.append(strong, document.createTextNode(` ${value}`), document.createElement('br'));
+            };
+            addInfoLine('Title', currentVideoTitle || '-');
+            addInfoLine('Channel', currentVideoChannel || '-');
+            addInfoLine('Video ID', videoId);
+            const languageLabel = document.createElement('strong');
+            languageLabel.textContent = 'Language:';
+            videoInfo.append(
+                languageLabel,
+                document.createTextNode(` ${language.language} (${language.language_code})`)
+            );
+            if (language.is_generated) {
+                const badge = document.createElement('span');
+                badge.className = 'language-badge';
+                badge.textContent = 'Auto-generated';
+                videoInfo.append(' ', badge);
+            }
 
             // Hide key points section and reset
             keyPointsBox.style.display = 'none';
@@ -948,6 +971,7 @@
                     body: JSON.stringify({
                         id: currentHistoryId,
                         title: currentVideoTitle || 'Untitled video',
+                        channelName: currentVideoChannel || '',
                         videoId: currentVideoId,
                         url: document.getElementById('urlInput').value.trim(),
                         language: currentLanguage,

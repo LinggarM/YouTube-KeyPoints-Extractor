@@ -581,7 +581,7 @@
                 <label class="search-wrap">
                     <span class="search-icon" aria-hidden="true">⌕</span>
                     <input class="search-input" id="searchInput" type="search"
-                        placeholder="Cari judul, video, bahasa, transkrip, atau key points..." autocomplete="off">
+                        placeholder="Cari judul, channel, video, bahasa, transkrip, atau key points..." autocomplete="off">
                 </label>
                 <span class="result-count" id="resultCount" aria-live="polite"></span>
             </div>
@@ -835,6 +835,7 @@
 
                 const metadata = document.createElement('div');
                 metadata.className = 'entry-meta';
+                if (entry.channelName) metadata.appendChild(makeChip(`${entry.channelName}`));
                 if (entry.videoId) metadata.appendChild(makeChip(`Video ${entry.videoId}`));
                 if (entry.language) metadata.appendChild(makeChip(entry.language));
                 metadata.appendChild(makeChip(entry.keyPoints ? 'Key points tersedia' : 'Transkrip saja'));
@@ -874,7 +875,9 @@
             document.getElementById('detailView').hidden = false;
             document.getElementById('detailTitle').textContent = entry.title || 'Untitled video';
             const detailMeta = document.getElementById('detailMeta');
-            detailMeta.replaceChildren(document.createTextNode('Video ID: '));
+            detailMeta.replaceChildren(
+                document.createTextNode(`Channel: ${entry.channelName || '-'} · Video ID: `)
+            );
             if (entry.videoId) {
                 const videoLink = document.createElement('a');
                 videoLink.href = `https://www.youtube.com/watch?v=${encodeURIComponent(entry.videoId)}`;

@@ -12,7 +12,10 @@ from contextlib import contextmanager
 
 app = Flask(__name__)
 HISTORY_DATABASE = os.path.join(app.instance_path, 'history.sqlite3')
-HISTORY_FIELDS = ('id', 'title', 'videoId', 'url', 'language', 'transcript', 'keyPoints', 'createdAt', 'updatedAt')
+HISTORY_FIELDS = (
+    'id', 'title', 'channelName', 'videoId', 'url', 'language',
+    'transcript', 'keyPoints', 'createdAt', 'updatedAt'
+)
 
 
 def get_history_connection():
@@ -24,6 +27,7 @@ def get_history_connection():
         CREATE TABLE IF NOT EXISTS history (
             id TEXT PRIMARY KEY,
             title TEXT NOT NULL,
+            channel_name TEXT NOT NULL DEFAULT '',
             video_id TEXT NOT NULL,
             url TEXT NOT NULL,
             language TEXT NOT NULL,
@@ -33,6 +37,9 @@ def get_history_connection():
             updated_at TEXT NOT NULL
         )
     ''')
+    columns = {row['name'] for row in connection.execute('PRAGMA table_info(history)')}
+    if 'channel_name' not in columns:
+        connection.execute("ALTER TABLE history ADD COLUMN channel_name TEXT NOT NULL DEFAULT ''")
     connection.execute('''
         CREATE TABLE IF NOT EXISTS history_imports (
             token TEXT PRIMARY KEY,
@@ -64,6 +71,7 @@ def validate_history_entry(entry):
     return {
         'id': entry['id'].strip(),
         'title': entry.get('title', '').strip() or 'Untitled video',
+        'channel_name': entry.get('channelName', '').strip(),
         'video_id': entry.get('videoId', '').strip(),
         'url': entry.get('url', '').strip(),
         'language': entry.get('language', '').strip(),
@@ -78,6 +86,7 @@ def insert_history_entry(connection, entry, ignore_existing=False):
     conflict_clause = 'DO NOTHING' if ignore_existing else '''
         DO UPDATE SET
             title = excluded.title,
+            channel_name = excluded.channel_name,
             video_id = excluded.video_id,
             url = excluded.url,
             language = excluded.language,
@@ -87,9 +96,11 @@ def insert_history_entry(connection, entry, ignore_existing=False):
     '''
     connection.execute(f'''
         INSERT INTO history (
-            id, title, video_id, url, language, transcript, key_points, created_at, updated_at
+            id, title, channel_name, video_id, url, language, transcript, key_points,
+            created_at, updated_at
         ) VALUES (
-            :id, :title, :video_id, :url, :language, :transcript, :key_points, :created_at, :updated_at
+            :id, :title, :channel_name, :video_id, :url, :language, :transcript,
+            :key_points, :created_at, :updated_at
         )
         ON CONFLICT(id) {conflict_clause}
     ''', entry)
@@ -99,6 +110,7 @@ def serialize_history_entry(row):
     return {
         'id': row['id'],
         'title': row['title'],
+        'channelName': row['channel_name'],
         'videoId': row['video_id'],
         'url': row['url'],
         'language': row['language'],
@@ -132,8 +144,8 @@ PROMPT_TEMPLATES = {
     )
 }
 
-def get_video_title(video_id):
-    """Get the title of a YouTube video using its oEmbed endpoint"""
+def get_video_metadata(video_id):
+    """Get the title and channel name using YouTube's oEmbed endpoint."""
     response = requests.get(
         "https://www.youtube.com/oembed",
         params={
@@ -145,9 +157,17 @@ def get_video_title(video_id):
     response.raise_for_status()
     response_data = response.json()
     if not isinstance(response_data, dict):
-        return None
+        return {}
     title = response_data.get('title')
-    return title.strip() if isinstance(title, str) and title.strip() else None
+    channel_name = response_data.get('author_name')
+    return {
+        'title': title.strip() if isinstance(title, str) and title.strip() else None,
+        'channel_name': (
+            channel_name.strip()
+            if isinstance(channel_name, str) and channel_name.strip()
+            else None
+        )
+    }
 
 def log_submission(url, video_id, video_title):
     """Append a successful transcript extraction to the submission log"""
@@ -395,11 +415,12 @@ def manage_history():
             escaped_search = search.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
             pattern = f'%{escaped_search}%'
             conditions.append(
-                "(title LIKE ? ESCAPE '\\' OR video_id LIKE ? ESCAPE '\\' "
+                "(title LIKE ? ESCAPE '\\' OR channel_name LIKE ? ESCAPE '\\' "
+                "OR video_id LIKE ? ESCAPE '\\' "
                 "OR language LIKE ? ESCAPE '\\' OR transcript LIKE ? ESCAPE '\\' "
                 "OR key_points LIKE ? ESCAPE '\\')"
             )
-            parameters.extend([pattern] * 5)
+            parameters.extend([pattern] * 6)
         if language:
             escaped_language = language.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
             conditions.append("language LIKE ? ESCAPE '\\'")
@@ -520,6 +541,7 @@ def get_transcript():
         url = data.get('url', '').strip()
         language_code = data.get('language_code', 'en')
         video_title = data.get('video_title')
+        video_channel = data.get('video_channel')
         
         if not url:
             return jsonify({'error': 'URL is required'}), 400
@@ -534,18 +556,32 @@ def get_transcript():
         if transcript is None:
             return jsonify({'error': 'Could not retrieve transcript. Video may not have subtitles in the selected language or may be private.'}), 404
 
-        if not isinstance(video_title, str) or not video_title.strip():
+        if (
+            not isinstance(video_title, str) or not video_title.strip() or
+            not isinstance(video_channel, str) or not video_channel.strip()
+        ):
             try:
-                video_title = get_video_title(video_id)
+                metadata = get_video_metadata(video_id)
+                if not isinstance(video_title, str) or not video_title.strip():
+                    video_title = metadata.get('title')
+                if not isinstance(video_channel, str) or not video_channel.strip():
+                    video_channel = metadata.get('channel_name')
             except requests.exceptions.RequestException as e:
-                app.logger.warning("Could not retrieve title for video %s: %s", video_id, e)
-                video_title = None
+                app.logger.warning("Could not retrieve metadata for video %s: %s", video_id, e)
+                video_title = video_title if isinstance(video_title, str) else None
+                video_channel = video_channel if isinstance(video_channel, str) else None
         video_title = video_title.strip() if isinstance(video_title, str) and video_title.strip() else 'Unknown video title'
+        video_channel = (
+            video_channel.strip()
+            if isinstance(video_channel, str) and video_channel.strip()
+            else ''
+        )
         log_submission(url, video_id, video_title)
         
         return jsonify({
             'video_id': video_id,
             'video_title': video_title,
+            'video_channel': video_channel,
             'transcript': transcript,
             'language_code': language_code,
             'success': True
