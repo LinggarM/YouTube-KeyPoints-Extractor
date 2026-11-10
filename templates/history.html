@@ -864,6 +864,10 @@
             </div>
             <div class="detail-content">
                 <section class="content-section">
+                    <h2>💬 Prompt</h2>
+                    <pre class="content-text" id="detailPrompt" data-no-translate></pre>
+                </section>
+                <section class="content-section">
                     <h2>📝 Transkrip</h2>
                     <pre class="content-text" id="detailTranscript" data-no-translate></pre>
                 </section>
@@ -1139,6 +1143,8 @@
             detailMeta.append(document.createTextNode(
                 ` · ${window.appLanguage === 'id' ? 'Bahasa' : 'Language'}: ${entry.language || '-'} · ${window.appLanguage === 'id' ? 'Disimpan' : 'Saved'} ${formatDate(entry.createdAt)}`
             ));
+            document.getElementById('detailPrompt').textContent = entry.prompt ||
+                window.translateAppText('Prompt belum tersedia untuk riwayat ini.');
             document.getElementById('detailTranscript').textContent =
                 entry.transcript || window.translateAppText('Transkrip tidak tersedia.');
             const keyPoints = document.getElementById('detailKeyPoints');

@@ -1503,6 +1503,7 @@
         let currentHistoryCreatedAt = '';
         let currentTranscript = '';
         let currentKeyPoints = '';
+        let currentPrompt = '';
         let availableLanguages = [];
         let selectedLanguage = null;
 
@@ -1744,6 +1745,7 @@
             currentHistoryId = `${Date.now()}-${Math.random().toString(36).slice(2)}`;
             currentHistoryCreatedAt = new Date().toISOString();
             currentKeyPoints = '';
+            currentPrompt = '';
             transcriptBox.textContent = transcript;
             videoInfo.replaceChildren();
             const addInfoLine = (label, value) => {
@@ -1789,6 +1791,7 @@
                         language: currentLanguage,
                         transcript: currentTranscript,
                         keyPoints: currentKeyPoints,
+                        prompt: currentPrompt,
                         createdAt: currentHistoryCreatedAt,
                         updatedAt: new Date().toISOString()
                     })
@@ -1809,7 +1812,7 @@
                 const response = await fetch(`/api/history/${encodeURIComponent(currentHistoryId)}`, {
                     method: 'PATCH',
                     headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({keyPoints: currentKeyPoints})
+                    body: JSON.stringify({keyPoints: currentKeyPoints, prompt: currentPrompt})
                 });
                 const result = await response.json();
                 if (!response.ok || !result.success) {
@@ -1878,6 +1881,7 @@
 
                     if (data.success) {
                         currentKeyPoints = data.key_points;
+                        currentPrompt = data.prompt;
                         // keyPointsBox.textContent = data.key_points;
                         keyPointsBox.innerHTML = formatKeyPointsTextToHTML(data.key_points);
                         keyPointsBox.style.display = 'block';

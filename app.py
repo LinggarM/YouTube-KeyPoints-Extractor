@@ -14,7 +14,7 @@ app = Flask(__name__)
 HISTORY_DATABASE = os.path.join(app.instance_path, 'history.sqlite3')
 HISTORY_FIELDS = (
     'id', 'title', 'channelName', 'videoId', 'url', 'language',
-    'transcript', 'keyPoints', 'createdAt', 'updatedAt'
+    'transcript', 'keyPoints', 'prompt', 'createdAt', 'updatedAt'
 )
 
 
@@ -33,6 +33,7 @@ def get_history_connection():
             language TEXT NOT NULL,
             transcript TEXT NOT NULL,
             key_points TEXT NOT NULL DEFAULT '',
+            prompt TEXT NOT NULL DEFAULT '',
             created_at TEXT NOT NULL,
             updated_at TEXT NOT NULL
         )
@@ -40,6 +41,8 @@ def get_history_connection():
     columns = {row['name'] for row in connection.execute('PRAGMA table_info(history)')}
     if 'channel_name' not in columns:
         connection.execute("ALTER TABLE history ADD COLUMN channel_name TEXT NOT NULL DEFAULT ''")
+    if 'prompt' not in columns:
+        connection.execute("ALTER TABLE history ADD COLUMN prompt TEXT NOT NULL DEFAULT ''")
     connection.execute('''
         CREATE TABLE IF NOT EXISTS history_imports (
             token TEXT PRIMARY KEY,
@@ -65,7 +68,11 @@ def validate_history_entry(entry):
         return None
     if any(not isinstance(entry.get(field, ''), str) for field in HISTORY_FIELDS):
         return None
-    if not entry.get('id', '').strip() or not entry.get('transcript', '').strip():
+    if (
+        not entry.get('id', '').strip() or
+        not entry.get('transcript', '').strip() or
+        len(entry.get('prompt', '')) > 2000
+    ):
         return None
     now = datetime.now(timezone.utc).isoformat()
     return {
@@ -77,6 +84,7 @@ def validate_history_entry(entry):
         'language': entry.get('language', '').strip(),
         'transcript': entry['transcript'],
         'key_points': entry.get('keyPoints', ''),
+        'prompt': entry.get('prompt', ''),
         'created_at': entry.get('createdAt', '').strip() or now,
         'updated_at': entry.get('updatedAt', '').strip() or now
     }
@@ -92,15 +100,16 @@ def insert_history_entry(connection, entry, ignore_existing=False):
             language = excluded.language,
             transcript = excluded.transcript,
             key_points = excluded.key_points,
+            prompt = excluded.prompt,
             updated_at = excluded.updated_at
     '''
     connection.execute(f'''
         INSERT INTO history (
             id, title, channel_name, video_id, url, language, transcript, key_points,
-            created_at, updated_at
+            prompt, created_at, updated_at
         ) VALUES (
             :id, :title, :channel_name, :video_id, :url, :language, :transcript,
-            :key_points, :created_at, :updated_at
+            :key_points, :prompt, :created_at, :updated_at
         )
         ON CONFLICT(id) {conflict_clause}
     ''', entry)
@@ -116,6 +125,7 @@ def serialize_history_entry(row):
         'language': row['language'],
         'transcript': row['transcript'],
         'keyPoints': row['key_points'],
+        'prompt': row['prompt'],
         'createdAt': row['created_at'],
         'updatedAt': row['updated_at']
     }
@@ -418,9 +428,9 @@ def manage_history():
                 "(title LIKE ? ESCAPE '\\' OR channel_name LIKE ? ESCAPE '\\' "
                 "OR video_id LIKE ? ESCAPE '\\' "
                 "OR language LIKE ? ESCAPE '\\' OR transcript LIKE ? ESCAPE '\\' "
-                "OR key_points LIKE ? ESCAPE '\\')"
+                "OR key_points LIKE ? ESCAPE '\\' OR prompt LIKE ? ESCAPE '\\')"
             )
-            parameters.extend([pattern] * 6)
+            parameters.extend([pattern] * 7)
         if language:
             escaped_language = language.replace('\\', '\\\\').replace('%', '\\%').replace('_', '\\_')
             conditions.append("language LIKE ? ESCAPE '\\'")
@@ -522,10 +532,19 @@ def update_or_delete_history(entry_id):
             key_points = data.get('keyPoints') if isinstance(data, dict) else None
             if not isinstance(key_points, str):
                 return jsonify({'error': 'Key points must be a string.'}), 400
-            cursor = connection.execute(
-                'UPDATE history SET key_points = ?, updated_at = ? WHERE id = ?',
-                (key_points, datetime.now(timezone.utc).isoformat(), entry_id)
-            )
+            prompt = data.get('prompt') if isinstance(data, dict) else None
+            if prompt is not None and (not isinstance(prompt, str) or len(prompt) > 2000):
+                return jsonify({'error': 'Prompt must be text no longer than 2000 characters.'}), 400
+            if prompt is None:
+                cursor = connection.execute(
+                    'UPDATE history SET key_points = ?, updated_at = ? WHERE id = ?',
+                    (key_points, datetime.now(timezone.utc).isoformat(), entry_id)
+                )
+            else:
+                cursor = connection.execute(
+                    'UPDATE history SET key_points = ?, prompt = ?, updated_at = ? WHERE id = ?',
+                    (key_points, prompt, datetime.now(timezone.utc).isoformat(), entry_id)
+                )
             if cursor.rowcount == 0:
                 return jsonify({'error': 'History entry not found.'}), 404
         return jsonify({'success': True})
@@ -646,6 +665,7 @@ def get_keypoints():
         
         return jsonify({
             'key_points': key_points,
+            'prompt': custom_prompt.strip() if prompt_type == 'custom' else PROMPT_TEMPLATES[prompt_type],
             'provider': provider,
             'model': model,
             'success': True
